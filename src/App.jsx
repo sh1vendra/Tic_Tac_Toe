@@ -61,7 +61,7 @@ export default function App() {
       <footer className="mt-8 text-[8px] text-white/20">
         {screen === 'game' && (
           <button onClick={handleMainMenu} className="hover:text-white/50 transition-colors">
-            ← MAIN MENU
+            ← BACK
           </button>
         )}
       </footer>
