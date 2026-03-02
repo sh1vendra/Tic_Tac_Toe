@@ -1,9 +1,8 @@
-import { useState, useCallback, useEffect } from 'react';
-import { getUserScore, updateUserScore } from '../firebase/scores';
+import { useState, useCallback } from 'react';
 
 const STORAGE_KEY = 'ttt-scores';
 
-function loadLocalScores() {
+function loadScores() {
   try {
     return JSON.parse(localStorage.getItem(STORAGE_KEY)) || { wins: 0, losses: 0, draws: 0 };
   } catch {
@@ -11,42 +10,26 @@ function loadLocalScores() {
   }
 }
 
-export function useScore(user) {
-  const [scores, setScores] = useState(loadLocalScores);
+function saveScores(scores) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(scores));
+}
 
-  // Sync from Firestore when user logs in
-  useEffect(() => {
-    if (!user) return;
-    getUserScore(user.uid).then((data) => {
-      if (data) setScores({ wins: data.wins || 0, losses: data.losses || 0, draws: data.draws || 0 });
-    });
-  }, [user]);
+export function useScore() {
+  const [scores, setScores] = useState(loadScores);
 
   const update = useCallback((key) => {
     setScores((prev) => {
       const next = { ...prev, [key]: prev[key] + 1 };
-      if (user) {
-        updateUserScore(user.uid, {
-          displayName: user.displayName,
-          photoURL: user.photoURL,
-          ...next,
-        });
-      } else {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-      }
+      saveScores(next);
       return next;
     });
-  }, [user]);
+  }, []);
 
   const resetScores = useCallback(() => {
     const zero = { wins: 0, losses: 0, draws: 0 };
+    saveScores(zero);
     setScores(zero);
-    if (user) {
-      updateUserScore(user.uid, { displayName: user.displayName, photoURL: user.photoURL, ...zero });
-    } else {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(zero));
-    }
-  }, [user]);
+  }, []);
 
   return {
     ...scores,
