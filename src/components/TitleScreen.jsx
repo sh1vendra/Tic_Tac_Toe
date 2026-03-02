@@ -32,14 +32,8 @@ export default function TitleScreen({ onStart }) {
                      active:scale-95"
           style={{ boxShadow: '0 0 10px #00fff5, 0 0 20px #00fff5' }}
         >
-          INSERT COIN
+          START
         </button>
-        <p className="text-[8px] text-white/30 animate-glow-pulse">PRESS START</p>
-      </div>
-
-      <div className="text-[8px] text-white/20 text-center">
-        <p>VS CPU ONLY</p>
-        <p className="mt-1">CHOOSE YOUR DIFFICULTY</p>
       </div>
     </div>
   );
