@@ -29,7 +29,6 @@ export default function DifficultySelect({ onSelect }) {
         ))}
       </div>
 
-      <p className="text-[8px] text-white/30">GOOD LUCK, PLAYER 1</p>
     </div>
   );
 }
