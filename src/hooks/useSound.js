@@ -1,14 +1,34 @@
+// Create AudioContext only on first user interaction (required by mobile browsers)
 function getCtx() {
   if (!window._audioCtx) {
-    // eslint-disable-next-line
     window._audioCtx = new (window.AudioContext || window['webkitAudioContext'])();
+
+    // Resume context on first tap anywhere — fixes iOS Safari / Android Chrome
+    const resume = () => {
+      if (window._audioCtx && window._audioCtx.state === 'suspended') {
+        window._audioCtx.resume();
+      }
+      window.removeEventListener('touchstart', resume);
+      window.removeEventListener('touchend', resume);
+      window.removeEventListener('click', resume);
+    };
+
+    window.addEventListener('touchstart', resume, { passive: true });
+    window.addEventListener('touchend', resume, { passive: true });
+    window.addEventListener('click', resume);
   }
   return window._audioCtx;
 }
 
-function beep(frequency, duration, type = 'square', volume = 0.3) {
+async function beep(frequency, duration, type = 'square', volume = 0.3) {
   try {
     const ctx = getCtx();
+
+    // Resume if suspended before playing any sound
+    if (ctx.state === 'suspended') {
+      await ctx.resume();
+    }
+
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
     osc.connect(gain);
@@ -27,14 +47,12 @@ function playMove() {
 }
 
 function playWin() {
-  // Ascending victory fanfare
   [523, 659, 784, 1047].forEach((f, i) => {
     setTimeout(() => beep(f, 0.15, 'square', 0.3), i * 100);
   });
 }
 
 function playLose() {
-  // Descending sad tones
   [400, 300, 200].forEach((f, i) => {
     setTimeout(() => beep(f, 0.2, 'sawtooth', 0.25), i * 150);
   });
