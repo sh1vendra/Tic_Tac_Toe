@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useGameState } from '../hooks/useGameState';
 import { useSound } from '../hooks/useSound';
+// sound functions are module-level stable references
 import Cell from './Cell';
 import WinLine from './WinLine';
 import GameOverModal from './GameOverModal';
@@ -29,7 +30,7 @@ export default function GameBoard({ difficulty, score, onGameEnd, onMainMenu }) 
       onGameEnd(status);
     }
     prevStatus.current = status;
-  }, [status, sound, onGameEnd]);
+  }, [status, onGameEnd]); // sound functions are module-level stable, no need in deps
 
   function handleCellClick(index) {
     if (board[index] || status !== 'playing') return;
